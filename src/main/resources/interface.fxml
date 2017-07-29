@@ -13,12 +13,13 @@
         <TextField fx:id="destinationPath" layoutX="14.0" layoutY="154.0" prefHeight="26.0" prefWidth="350.0"/>
         <Button fx:id="destinationButton" layoutX="386.0" layoutY="154.0" mnemonicParsing="false"
                 onAction="#chooseDestination" prefHeight="26.0" prefWidth="200.0" text="Choose destination path..."/>
-        <Label layoutX="88.0" layoutY="25.0" onMouseClicked="#changeTheme" text="Curse Modpack Downloader">
+        <Label fx:id="title" alignment="CENTER" layoutX="73.0" layoutY="27.0" onMouseClicked="#changeTheme"
+               prefWidth="450.0" text="Curse Modpack Downloader">
             <font>
                 <Font size="30.0"/>
             </font>
         </Label>
-        <Button fx:id="downloadButton" layoutX="177.0" layoutY="194.0" mnemonicParsing="false" onAction="#startDownload"
+        <Button fx:id="downloadButton" layoutX="173.0" layoutY="194.0" mnemonicParsing="false" onAction="#startDownload"
                 prefHeight="46.0" prefWidth="250.0" text="Start Download">
             <font>
                 <Font size="24.0"/>

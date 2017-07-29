@@ -4,6 +4,8 @@ package com.github.franckyi.cmpdl;
 import com.github.franckyi.cmpdl.task.CleanTask;
 import com.github.franckyi.cmpdl.task.DownloadModpackTask;
 import com.github.franckyi.cmpdl.task.VerifyProjectTask;
+import javafx.animation.Animation;
+import javafx.animation.TranslateTransition;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -14,6 +16,7 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.DirectoryChooser;
+import javafx.util.Duration;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,7 +38,16 @@ public class InterfaceController implements Initializable {
         log(CMPDL.title());
         log("Java version " + System.getProperty("java.version"));
         destinationPath.setText(System.getProperty("user.home") + File.separator + "modpack");
+        TranslateTransition transition = new TranslateTransition(Duration.seconds(1), title);
+        transition.setFromY(-10);
+        transition.setToY(10);
+        transition.setCycleCount(Animation.INDEFINITE);
+        transition.setAutoReverse(true);
+        transition.play();
     }
+
+    @FXML
+    private Label title;
 
     @FXML
     private TextField modpackURL;
@@ -190,9 +202,9 @@ public class InterfaceController implements Initializable {
         downloadButton.setDisable(value);
         verifyButton.setDisable(value);
         destinationButton.setDisable(value);
-        modpackURL.setEditable(value);
-        fileID.setEditable(value);
-        destinationPath.setEditable(value);
+        modpackURL.setEditable(!value);
+        fileID.setEditable(!value);
+        destinationPath.setEditable(!value);
     }
 
     public void setPrimaryProgress(Task<?> task, String text) {
