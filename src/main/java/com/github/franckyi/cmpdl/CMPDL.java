@@ -16,7 +16,7 @@ import java.util.Set;
 public class CMPDL extends Application {
 
     private static final String NAME = "Curse Modpack Downloader";
-    private static final String VERSION = "2.0.0-b1";
+    private static final String VERSION = "2.0.0-b2";
     private static final String AUTHOR = "Franckyi (original version by Vazkii)";
 
     public static String title() {
