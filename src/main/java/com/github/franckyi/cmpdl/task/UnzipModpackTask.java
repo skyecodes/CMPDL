@@ -17,7 +17,7 @@ public class UnzipModpackTask extends CustomTask<Void> {
 
     @Override
     protected Void call0() throws Exception {
-        log("> Unzipping file at " + folder.getAbsolutePath());
+        log("Unzipping file at " + folder.getAbsolutePath());
         FileInputStream is = new FileInputStream(zipfile.getCanonicalFile());
         FileChannel channel = is.getChannel();
         ZipEntry ze;
@@ -56,6 +56,6 @@ public class UnzipModpackTask extends CustomTask<Void> {
         DownloadModsTask task = new DownloadModsTask(folder);
         getController().setPrimaryProgress(task, "Step 2/3 : Downloading dependencies");
         new Thread(task).start();
-        log("> Unzipping succeeded !");
+        log("Unzipping succeeded !");
     }
 }

@@ -23,7 +23,7 @@ public class DownloadModpackTask extends CustomTask<Void> {
 
     @Override
     protected Void call0() throws Exception {
-        log("> Downloading modpack at " + url);
+        log("Downloading modpack at " + url);
         this.updateProgress(0, 1);
         HttpURLConnection httpConnection = (HttpURLConnection) url.openConnection();
         long completeFileSize = httpConnection.getContentLength();
@@ -47,7 +47,7 @@ public class DownloadModpackTask extends CustomTask<Void> {
         UnzipModpackTask task = new UnzipModpackTask(tmp);
         getController().setSecondaryProgress(task, "Unzipping modpack");
         new Thread(task).start();
-        log("> Download succeeded !");
+        log("Download succeeded !");
     }
 
 }

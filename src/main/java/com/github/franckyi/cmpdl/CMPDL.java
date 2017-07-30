@@ -1,7 +1,5 @@
 package com.github.franckyi.cmpdl;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -16,7 +14,7 @@ import java.util.Set;
 public class CMPDL extends Application {
 
     private static final String NAME = "Curse Modpack Downloader";
-    private static final String VERSION = "2.0.0-b2";
+    private static final String VERSION = "2.0.0-b3";
     private static final String AUTHOR = "Franckyi (original version by Vazkii)";
 
     public static String title() {
@@ -26,7 +24,6 @@ public class CMPDL extends Application {
     public static InterfaceController controller;
     public static Parent parent;
     public static Stage stage;
-    public static Gson gson;
 
     public static String path;
     public static String zipFileName;
@@ -35,7 +32,6 @@ public class CMPDL extends Application {
 
     public void start(Stage primaryStage) throws Exception {
         stage = primaryStage;
-        gson = new GsonBuilder().create();
         URL interface0 = getClass().getClassLoader().getResource("interface.fxml");
         if (interface0 != null) {
             FXMLLoader loader = new FXMLLoader(interface0);

@@ -38,12 +38,14 @@ public class InterfaceController implements Initializable {
         log(CMPDL.title());
         log("Java version " + System.getProperty("java.version"));
         destinationPath.setText(System.getProperty("user.home") + File.separator + "modpack");
-        TranslateTransition transition = new TranslateTransition(Duration.seconds(1), title);
-        transition.setFromY(-10);
-        transition.setToY(10);
-        transition.setCycleCount(Animation.INDEFINITE);
-        transition.setAutoReverse(true);
-        transition.play();
+        if (System.getProperty("os.name").toLowerCase().contains("win")) {
+            TranslateTransition transition = new TranslateTransition(Duration.seconds(1), title);
+            transition.setFromY(-10);
+            transition.setToY(10);
+            transition.setCycleCount(Animation.INDEFINITE);
+            transition.setAutoReverse(true);
+            transition.play();
+        }
     }
 
     @FXML
@@ -56,7 +58,7 @@ public class InterfaceController implements Initializable {
     private TextField fileID;
 
     @FXML
-    public TextField destinationPath;
+    private TextField destinationPath;
 
     @FXML
     private TextArea logTextArea;

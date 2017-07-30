@@ -1,8 +1,11 @@
 package com.github.franckyi.cmpdl;
 
+import com.eclipsesource.json.JsonArray;
+import com.eclipsesource.json.JsonObject;
+
+import java.util.ArrayList;
 import java.util.List;
 
-@SuppressWarnings("unused")
 public class ManifestJson {
 
     public MinecraftJson minecraft;
@@ -15,13 +18,44 @@ public class ManifestJson {
         return "N/A";
     }
 
-    @SuppressWarnings("unused")
+    public static ManifestJson from(JsonObject root) {
+        ManifestJson manifestJson = new ManifestJson();
+        MinecraftJson minecraftJson = manifestJson.new MinecraftJson();
+        JsonObject minecraft = root.get("minecraft").asObject();
+        minecraftJson.version = minecraft.getString("version", "N/A");
+        minecraftJson.modLoaders = new ArrayList<>();
+        JsonArray modLoaders = minecraft.get("modLoaders").asArray();
+        modLoaders.iterator().forEachRemaining(jsonValue -> {
+            JsonObject modloader = jsonValue.asObject();
+            MinecraftJson.ModloaderJson modloaderJson = minecraftJson.new ModloaderJson();
+            modloaderJson.id = modloader.getString("id", "N/A");
+            modloaderJson.primary = modloader.getBoolean("primary", false);
+            minecraftJson.modLoaders.add(modloaderJson);
+        });
+        manifestJson.minecraft = minecraftJson;
+        manifestJson.manifestType = root.getString("manifestType", "N/A");
+        manifestJson.manifestVersion = root.getInt("manifestVersion", 0);
+        manifestJson.name = root.getString("name", "N/A");
+        manifestJson.version = root.getString("version", "N/A");
+        manifestJson.author = root.getString("author", "N/A");
+        manifestJson.files = new ArrayList<>();
+        JsonArray files = root.get("files").asArray();
+        files.iterator().forEachRemaining(jsonValue -> {
+            JsonObject file = jsonValue.asObject();
+            FileJson fileJson = manifestJson.new FileJson();
+            fileJson.projectID = file.getInt("projectID", 0);
+            fileJson.fileID = file.getInt("fileID", 0);
+            fileJson.required = file.getBoolean("required", false);
+            manifestJson.files.add(fileJson);
+        });
+        return manifestJson;
+    }
+
     public class MinecraftJson {
 
         public String version;
         public List<ModloaderJson> modLoaders;
 
-        @SuppressWarnings("unused")
         public class ModloaderJson {
 
             public String id;
@@ -37,7 +71,6 @@ public class ManifestJson {
     public String author;
     public List<FileJson> files;
 
-    @SuppressWarnings("unused")
     public class FileJson {
 
         public int projectID;

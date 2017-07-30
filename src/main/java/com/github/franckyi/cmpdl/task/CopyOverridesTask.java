@@ -22,7 +22,7 @@ public class CopyOverridesTask extends CustomTask<Void> {
 
     @Override
     protected Void call0() throws Exception {
-        log("> Copying overrides");
+        log("Copying overrides");
         if (dir.isDirectory()) {
             for (File file : dir.listFiles()) {
                 if (!processFile(file)) return null;
@@ -75,7 +75,7 @@ public class CopyOverridesTask extends CustomTask<Void> {
 
     @Override
     protected void succeeded() {
-        log("> Done copying overrides");
+        log("Done copying overrides");
         new Thread(new CleanTask(manifest)).start();
     }
 
@@ -104,7 +104,7 @@ public class CopyOverridesTask extends CustomTask<Void> {
                 }
                 out.close();
             }
-            log("> > Copied " + dest.getName());
+            log("> Copied " + dest.getName());
             return null;
         }
     }

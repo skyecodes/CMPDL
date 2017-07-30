@@ -1,5 +1,6 @@
 package com.github.franckyi.cmpdl.task;
 
+import com.eclipsesource.json.Json;
 import com.github.franckyi.cmpdl.CMPDL;
 import com.github.franckyi.cmpdl.ManifestJson;
 import javafx.application.Platform;
@@ -24,14 +25,14 @@ public class DownloadModsTask extends CustomTask<Void> {
     @Override
     protected Void call0() throws Exception {
         updateProgress(0, 1);
-        manifest = CMPDL.gson.fromJson(new FileReader(CMPDL.getManifestFile()), ManifestJson.class);
+        manifest = ManifestJson.from(Json.parse(new FileReader(CMPDL.getManifestFile())).asObject());
         int length = manifest.files.size();
-        log("### " + manifest.name + " v" + manifest.version + " by " + manifest.author + " ###");
-        log("> Mods download started : " + length + " files found");
+        log("# " + manifest.name + " v" + manifest.version + " by " + manifest.author);
+        log("Mods download started : " + length + " files found");
         final int[] i = {0};
         for (ManifestJson.FileJson fileJson : manifest.files) {
             if (!isCancelled()) {
-                log("> > Resolving " + fileJson.projectID + ":" + fileJson.fileID + " (" + (i[0]++) + "/" + length + ")");
+                log("# Resolving " + fileJson.projectID + ":" + fileJson.fileID + " (" + (i[0]++ + 1) + "/" + length + ")");
                 DownloadModTask task = new DownloadModTask(fileJson);
                 task.setOnSucceeded(event -> updateProgress(i[0] - 1, length));
                 new Thread(task).start();
@@ -66,7 +67,7 @@ public class DownloadModsTask extends CustomTask<Void> {
             if (DownloadModsTask.this.isCancelled()) return null;
             URL url = new URL(url0);
             String fileName = new File(url.getFile()).getName().replaceAll("%20", " ");
-            log("> > > Downloading " + fileName);
+            log("> Downloading " + fileName);
             Platform.runLater(() -> getController().setSecondaryProgress(this, fileName));
             HttpURLConnection httpConnection = (HttpURLConnection) url.openConnection();
             long completeFileSize = httpConnection.getContentLength();
@@ -84,7 +85,7 @@ public class DownloadModsTask extends CustomTask<Void> {
             }
             fos.close();
             bis.close();
-            log("> > > Download succeeded !");
+            log("> Download succeeded !");
             return null;
         }
 
