@@ -7,6 +7,14 @@ CMPDL is a Java application created by Franckyi, based on [Vazkii's project](htt
 
 This project is under the [MIT License](LICENSE).
 
+### As this project is based on the JavaFX framework, UNIX system users must install OpenJFX or Oracle's JDK to start the application.
+
+What changed between Vazkii's version and my version ?
+
+- A revamped user interface
+- Support for mods.curse.com website
+- The user can choose the destination path
+
 ## How to use ?
 
 - Paste the modpack URL in the "Modpack URL" field.
