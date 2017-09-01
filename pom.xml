@@ -13,9 +13,9 @@
     </properties>
     <dependencies>
         <dependency>
-            <groupId>com.eclipsesource.minimal-json</groupId>
-            <artifactId>minimal-json</artifactId>
-            <version>0.9.4</version>
+            <groupId>com.mashape.unirest</groupId>
+            <artifactId>unirest-java</artifactId>
+            <version>1.4.9</version>
         </dependency>
     </dependencies>
     <build>

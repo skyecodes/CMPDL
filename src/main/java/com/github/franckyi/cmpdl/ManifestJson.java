@@ -1,7 +1,7 @@
 package com.github.franckyi.cmpdl;
 
-import com.eclipsesource.json.JsonArray;
-import com.eclipsesource.json.JsonObject;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,34 +18,34 @@ public class ManifestJson {
         return "N/A";
     }
 
-    public static ManifestJson from(JsonObject root) {
+    public static ManifestJson from(JSONObject root) {
         ManifestJson manifestJson = new ManifestJson();
         MinecraftJson minecraftJson = manifestJson.new MinecraftJson();
-        JsonObject minecraft = root.get("minecraft").asObject();
-        minecraftJson.version = minecraft.getString("version", "N/A");
+        JSONObject minecraft = root.getJSONObject("minecraft");
+        minecraftJson.version = minecraft.getString("version");
         minecraftJson.modLoaders = new ArrayList<>();
-        JsonArray modLoaders = minecraft.get("modLoaders").asArray();
+        JSONArray modLoaders = minecraft.getJSONArray("modLoaders");
         modLoaders.iterator().forEachRemaining(jsonValue -> {
-            JsonObject modloader = jsonValue.asObject();
+            JSONObject modloader = (JSONObject) jsonValue;
             MinecraftJson.ModloaderJson modloaderJson = minecraftJson.new ModloaderJson();
-            modloaderJson.id = modloader.getString("id", "N/A");
-            modloaderJson.primary = modloader.getBoolean("primary", false);
+            modloaderJson.id = modloader.getString("id");
+            modloaderJson.primary = modloader.getBoolean("primary");
             minecraftJson.modLoaders.add(modloaderJson);
         });
         manifestJson.minecraft = minecraftJson;
-        manifestJson.manifestType = root.getString("manifestType", "N/A");
-        manifestJson.manifestVersion = root.getInt("manifestVersion", 0);
-        manifestJson.name = root.getString("name", "N/A");
-        manifestJson.version = root.getString("version", "N/A");
-        manifestJson.author = root.getString("author", "N/A");
+        manifestJson.manifestType = root.getString("manifestType");
+        manifestJson.manifestVersion = root.getInt("manifestVersion");
+        manifestJson.name = root.getString("name");
+        manifestJson.version = root.getString("version");
+        manifestJson.author = root.getString("author");
         manifestJson.files = new ArrayList<>();
-        JsonArray files = root.get("files").asArray();
+        JSONArray files = root.getJSONArray("files");
         files.iterator().forEachRemaining(jsonValue -> {
-            JsonObject file = jsonValue.asObject();
+            JSONObject file = (JSONObject) jsonValue;
             FileJson fileJson = manifestJson.new FileJson();
-            fileJson.projectID = file.getInt("projectID", 0);
-            fileJson.fileID = file.getInt("fileID", 0);
-            fileJson.required = file.getBoolean("required", false);
+            fileJson.projectID = file.getInt("projectID");
+            fileJson.fileID = file.getInt("fileID");
+            fileJson.required = file.getBoolean("required");
             manifestJson.files.add(fileJson);
         });
         return manifestJson;

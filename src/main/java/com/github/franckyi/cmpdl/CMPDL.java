@@ -14,8 +14,8 @@ import java.util.Set;
 public class CMPDL extends Application {
 
     private static final String NAME = "Curse Modpack Downloader";
-    private static final String VERSION = "2.0.0-b3";
-    private static final String AUTHOR = "Franckyi (original version by Vazkii)";
+    private static final String VERSION = "2.1.0-b1";
+    private static final String AUTHOR = "Franckyi";
 
     public static String title() {
         return String.format("%s v%s by %s", NAME, VERSION, AUTHOR);

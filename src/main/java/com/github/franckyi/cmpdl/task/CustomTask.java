@@ -51,8 +51,7 @@ abstract class CustomTask<V> extends Task<V> {
     private String getLocation(String url) throws IOException {
         HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
         connection.setInstanceFollowRedirects(false);
-        if (connection.getResponseCode() < 200 || connection.getResponseCode() >= 400)
-            throw new IOException("Error " + connection.getResponseCode() + " at " + url);
+        connection.getInputStream();
         return connection.getHeaderField("location");
     }
 }

@@ -26,6 +26,7 @@ public class VerifyProjectTask extends CustomTask<Optional<String>> {
             url = new URL(modpackURL);
         } catch (MalformedURLException e) {
             log("The URL is malformed. This will not work !");
+            trace(e);
             return Optional.empty();
         }
         protocol = url.getProtocol();
@@ -43,13 +44,14 @@ public class VerifyProjectTask extends CustomTask<Optional<String>> {
             fileID = "latest";
         }
         if (host.equals("www.feed-the-beast.com") && fileID.equals("latest")) {
-            log("You must specify a file ID other than\n'latest' for host www.feed-the-beast.com.");
+            log("You must specify a file ID other than 'latest' for host www.feed-the-beast.com.");
             return Optional.empty();
         }
         try {
             return Optional.of(crawl(isCurse ? modpackURL + "/" + (fileID.equals("latest") ? "download" : fileID) : modpackURL + "/files/" + fileID + (fileID.equals("latest") ? "" : "/download")));
         } catch (IOException e) {
             log("The file doesn't exist or website is unreachable !");
+            trace(e);
             return Optional.empty();
         }
     }
