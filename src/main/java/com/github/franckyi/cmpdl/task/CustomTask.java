@@ -7,6 +7,8 @@ import javafx.concurrent.Task;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 abstract class CustomTask<V> extends Task<V> {
@@ -37,18 +39,28 @@ abstract class CustomTask<V> extends Task<V> {
         return CMPDL.controller;
     }
 
-    String crawl(String url) throws IOException, IllegalArgumentException {
-        String location = getLocation(url);
-        return location != null ? crawl(location) : url;
+    String crawl(String url) throws IOException, URISyntaxException {
+        URL url0 = new URL(crawl0(url));
+        return new URI(url0.getProtocol(), url0.getHost(), url0.getFile(), null).toASCIIString();
     }
 
-    String crawlAddHost(String url) throws IOException, IllegalArgumentException {
+    String crawlAddHost(String url) throws IOException, URISyntaxException {
+        URL url0 = new URL(crawlAddHost0(url));
+        return new URI(url0.getProtocol(), url0.getHost(), url0.getFile(), null).toASCIIString();
+    }
+
+    private String crawl0(String url) throws IOException, IllegalArgumentException, URISyntaxException {
+        String location = getLocation(url);
+        return location != null ? crawl0(location) : url;
+    }
+
+    private String crawlAddHost0(String url) throws IOException, IllegalArgumentException, URISyntaxException {
         URL url0 = new URL(url);
         String location = getLocation(url);
-        return location != null ? location.contains("://") ? crawlAddHost(location) : crawl(url0.getProtocol() + "://" + url0.getHost() + location) : url;
+        return location != null ? location.contains("://") ? crawlAddHost0(location) : crawl0(url0.getProtocol() + "://" + url0.getHost() + location) : url;
     }
 
-    private String getLocation(String url) throws IOException {
+    private String getLocation(String url) throws IOException, URISyntaxException {
         HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
         connection.setInstanceFollowRedirects(false);
         if (connection.getResponseCode() < 200 || connection.getResponseCode() >= 400)

@@ -11,6 +11,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLDecoder;
 
 public class DownloadModsTask extends CustomTask<Void> {
 
@@ -65,8 +66,8 @@ public class DownloadModsTask extends CustomTask<Void> {
             updateProgress(0, 1);
             String url0 = crawl(crawlAddHost("http://minecraft.curseforge.com/projects/" + fileJson.projectID) + "/files/" + fileJson.fileID + "/download");
             if (DownloadModsTask.this.isCancelled()) return null;
-            URL url = new URL(url0);
-            String fileName = new File(url.getFile()).getName().replaceAll("%20", " ");
+            URL url = new URL(url0.replaceAll("%25", "%"));
+            String fileName = new File(URLDecoder.decode(url.getFile(), "UTF-8")).getName();
             log("> Downloading " + fileName);
             Platform.runLater(() -> getController().setSecondaryProgress(this, fileName));
             HttpURLConnection httpConnection = (HttpURLConnection) url.openConnection();

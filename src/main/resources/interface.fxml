@@ -25,7 +25,7 @@
                 <Font size="24.0"/>
             </font>
         </Button>
-        <Label layoutX="11.0" layoutY="81.0" text="Modpack URL (Curse, Curseforge or FTB) :"/>
+        <Label layoutX="11.0" layoutY="81.0" text="Modpack URL (Curseforge or FTB) :"/>
         <Label layoutX="386.0" layoutY="81.0" text="File ID :"/>
         <Separator layoutX="50.0" layoutY="250.0" prefWidth="500.0"/>
         <TextArea fx:id="logTextArea" editable="false" layoutX="25.0" layoutY="296.0" prefHeight="200.0"

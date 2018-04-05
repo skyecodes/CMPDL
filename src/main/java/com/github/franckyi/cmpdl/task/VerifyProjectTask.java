@@ -31,10 +31,10 @@ public class VerifyProjectTask extends CustomTask<Optional<String>> {
         protocol = url.getProtocol();
         host = url.getHost();
         folder = url.getFile();
-        isCurse = host.equals("mods.curse.com");
+        isCurse = host.equals("www.curseforge.com");
         protocolValid = Arrays.asList("http", "https").contains(protocol);
-        hostValid = Arrays.asList("mods.curse.com", "minecraft.curseforge.com", "www.feed-the-beast.com").contains(host);
-        folderValid = isCurse ? folder.startsWith("/modpacks/minecraft/") && folder.split("/").length == 4 : folder.startsWith("/projects/") && folder.split("/").length == 3;
+        hostValid = Arrays.asList("www.curseforge.com", "minecraft.curseforge.com", "www.feed-the-beast.com").contains(host);
+        folderValid = isCurse ? folder.startsWith("/minecraft/modpacks/") && folder.split("/").length == 4 : folder.startsWith("/projects/") && folder.split("/").length == 3;
         if (!protocolValid || !hostValid || !folderValid) {
             log("The URL is incorrect !" + (!protocolValid ? "\n- Protocol invalid" : "") + (!hostValid ? "\n- Host invalid" : "") + (!folderValid ? "\n- Folder invalid" : ""));
             return Optional.empty();
@@ -42,12 +42,12 @@ public class VerifyProjectTask extends CustomTask<Optional<String>> {
         if (fileID.isEmpty()) {
             fileID = "latest";
         }
-        if (host.equals("www.feed-the-beast.com") && fileID.equals("latest")) {
-            log("You must specify a file ID other than\n'latest' for host www.feed-the-beast.com.");
+        if ((host.equals("www.feed-the-beast.com") || host.equals("www.curseforge.com")) && fileID.equals("latest")) {
+            log("You must specify a file ID other than\n'latest' for host www.feed-the-beast.com or www.curseforge.com.");
             return Optional.empty();
         }
         try {
-            return Optional.of(crawl(isCurse ? modpackURL + "/" + (fileID.equals("latest") ? "download" : fileID) : modpackURL + "/files/" + fileID + (fileID.equals("latest") ? "" : "/download")));
+            return Optional.of(crawl(isCurse ? modpackURL + "/download/" + fileID + "/file" : modpackURL + "/files/" + fileID + (fileID.equals("latest") ? "" : "/download")));
         } catch (IOException e) {
             log("The file doesn't exist or website is unreachable !");
             return Optional.empty();

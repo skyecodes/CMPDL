@@ -6,7 +6,7 @@
 
     <groupId>com.github.franckyi</groupId>
     <artifactId>cmpdl</artifactId>
-    <version>2.0.0-b3</version>
+    <version>2.0.0</version>
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
