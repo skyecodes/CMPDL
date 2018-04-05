@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+      spacing="10.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.github.franckyi.cmpdl.controller.ModpackPaneController">
+    <children>
+        <Label text="Step 1/4 : Choose a modpack">
+            <font>
+                <Font size="18.0"/>
+            </font>
+        </Label>
+        <GridPane hgap="10.0">
+            <columnConstraints>
+                <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0"/>
+                <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0"/>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0"/>
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+            </rowConstraints>
+            <children>
+                <TextField fx:id="urlField" minWidth="400.0" GridPane.columnIndex="2"/>
+                <TextField fx:id="idField" disable="true" maxWidth="100.0" GridPane.columnIndex="2"
+                           GridPane.rowIndex="1"/>
+                <RadioButton fx:id="urlButton" mnemonicParsing="false" selected="true" text="From URL :"
+                             GridPane.columnIndex="1">
+                    <toggleGroup>
+                        <ToggleGroup fx:id="modpack"/>
+                    </toggleGroup>
+                </RadioButton>
+                <RadioButton fx:id="idButton" mnemonicParsing="false" text="From project ID :" toggleGroup="$modpack"
+                             GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+            </children>
+        </GridPane>
+    </children>
+</VBox>
