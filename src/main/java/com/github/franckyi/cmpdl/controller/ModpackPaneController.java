@@ -1,18 +1,17 @@
 package com.github.franckyi.cmpdl.controller;
 
+import com.github.franckyi.cmpdl.CMPDL;
+import com.github.franckyi.cmpdl.task.cursemeta.GetProjectIdTask;
+import com.github.franckyi.cmpdl.task.cursemeta.GetProjectTask;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import org.json.JSONObject;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class ModpackPaneController implements Initializable {
+public class ModpackPaneController implements Initializable, IContentController {
 
     @FXML
     private TextField urlField;
@@ -35,35 +34,54 @@ public class ModpackPaneController implements Initializable {
         idField.disableProperty().bind(idButton.selectedProperty().not());
     }
 
-    public int getProjectID() {
-        int projectId;
+    @Override
+    public void handleNext() {
         if (modpack.getSelectedToggle() == urlButton) {
-            try {
-                URL url = new URL(urlField.getText());
-                Document doc = Jsoup.parse(url, 10000);
-                if (url.getHost().equals("www.curseforge.com")) {
-                    projectId = new JSONObject(doc.select("a.download-button").get(0).attr("data-action-value")).getInt("ProjectID");
-                } else {
-                    projectId = Integer.parseInt(doc.select("ul.project-details").get(0).child(1).html());
-                }
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-                new Alert(Alert.AlertType.ERROR, "The URL is malformed", ButtonType.OK).show();
-                return -1;
-            } catch (IOException e) {
-                e.printStackTrace();
-                new Alert(Alert.AlertType.ERROR, "Connection error", ButtonType.OK).show();
-                return -1;
-            }
+            Alert alert = new Alert(Alert.AlertType.INFORMATION, "Parsing project ID...", ButtonType.CLOSE);
+            alert.show();
+            GetProjectIdTask task = new GetProjectIdTask(urlField.getText());
+            task.setOnSucceeded(event -> {
+                alert.hide();
+                handleNext(task.getValue().orElse(-1));
+            });
+            CMPDL.EXECUTOR_SERVICE.execute(task);
         } else {
+            int projectId = -1;
             try {
-                projectId = Integer.parseInt(idButton.getText());
+                projectId = Integer.parseInt(idField.getText());
             } catch (NumberFormatException e) {
                 e.printStackTrace();
                 new Alert(Alert.AlertType.ERROR, "The project ID must be an integer", ButtonType.OK).show();
-                return -1;
             }
+            handleNext(projectId);
         }
-        return projectId;
+    }
+
+    @Override
+    public void handlePrevious() {
+
+    }
+
+    @Override
+    public void handleStart() {
+
+    }
+
+    public void handleNext(int projectId) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION, "Loading project data...", ButtonType.CLOSE);
+        alert.show();
+        GetProjectTask task = new GetProjectTask(projectId);
+        task.setOnSucceeded(event -> Platform.runLater(() -> task.getValue().ifPresent(project -> {
+            if (project.isModpack()) {
+                CMPDL.filePane.getController().setProject(project);
+                CMPDL.filePane.getController().viewLatestFiles();
+                CMPDL.mainWindow.getController().setContent(CMPDL.filePane);
+                alert.hide();
+            } else {
+                alert.hide();
+                new Alert(Alert.AlertType.ERROR, "The project isn't a modpack !", ButtonType.OK).show();
+            }
+        })));
+        CMPDL.EXECUTOR_SERVICE.execute(task);
     }
 }

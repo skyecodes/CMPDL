@@ -10,7 +10,7 @@
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
     </padding>
-    <Label text="CMPDL">
+    <Label onMouseClicked="#switchTheme" text="CMPDL">
         <font>
             <Font name="System Bold" size="24.0"/>
         </font>
@@ -25,7 +25,7 @@
         <Button fx:id="previousButton" disable="true" mnemonicParsing="false" onAction="#actionPrevious"
                 text="Previous"/>
         <Button fx:id="nextButton" mnemonicParsing="false" onAction="#actionNext" text="Next"/>
-        <Button fx:id="finishButton" disable="true" mnemonicParsing="false" onAction="#actionFinish" text="Finish">
+        <Button fx:id="startButton" disable="true" mnemonicParsing="false" onAction="#actionStart" text="Start">
             <HBox.margin>
                 <Insets left="20.0"/>
             </HBox.margin>

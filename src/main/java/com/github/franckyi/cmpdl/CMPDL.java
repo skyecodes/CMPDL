@@ -1,10 +1,21 @@
 package com.github.franckyi.cmpdl;
 
 import com.github.franckyi.cmpdl.controller.*;
-import com.mashape.unirest.http.Unirest;
+import com.github.franckyi.cmpdl.core.ContentControllerView;
+import com.github.franckyi.cmpdl.core.ControllerView;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
+
+import java.awt.*;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class CMPDL extends Application {
 
@@ -13,34 +24,56 @@ public class CMPDL extends Application {
     public static final String AUTHOR = "Franckyi";
     public static final String TITLE = String.format("%s v%s by %s", NAME, VERSION, AUTHOR);
 
+    public static final String USER_AGENT = String.format("Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:59.0) Gecko/20100101 Firefox/59.0 %s/%s (%s)", NAME, VERSION, AUTHOR);
+
+    public static final ExecutorService EXECUTOR_SERVICE = Executors.newCachedThreadPool();
+
     public static Stage stage;
+    public static Scene scene;
 
     public static ControllerView<MainWindowController> mainWindow;
-    public static ControllerView<ModpackPaneController> modpackPane;
-    public static ControllerView<FilePaneController> filePane;
-    public static ControllerView<DestinationPaneController> destinationPane;
-    public static ControllerView<ProgressPaneController> progressPane;
+    public static ContentControllerView<ModpackPaneController> modpackPane;
+    public static ContentControllerView<FilePaneController> filePane;
+    public static ContentControllerView<DestinationPaneController> destinationPane;
+    public static ContentControllerView<ProgressPaneController> progressPane;
+
+    public static ContentControllerView<?> currentContent;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        modpackPane = new ControllerView<>("ModpackPane.fxml", EnumContent.MODPACK);
-        filePane = new ControllerView<>("FilePane.fxml", EnumContent.FILE);
-        destinationPane = new ControllerView<>("DestinationPane.fxml", EnumContent.DESTINATION);
-        progressPane = new ControllerView<>("ProgressPane.fxml", EnumContent.PROGRESS);
-        mainWindow = new ControllerView<>("MainWindow.fxml");
         stage = primaryStage;
-        stage.setScene(new Scene(mainWindow.getView()));
+        modpackPane = new ContentControllerView<>("ModpackPane.fxml");
+        filePane = new ContentControllerView<>("FilePane.fxml");
+        destinationPane = new ContentControllerView<>("DestinationPane.fxml");
+        progressPane = new ContentControllerView<>("ProgressPane.fxml");
+        mainWindow = new ControllerView<>("MainWindow.fxml");
+        scene = new Scene(mainWindow.getView());
+        stage.setScene(scene);
         stage.setTitle(TITLE);
         stage.show();
     }
 
     public static void main(String[] args) {
-        Unirest.clearDefaultHeaders();
-        Unirest.setDefaultHeader("User-Agent", String.format("Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:59.0) Gecko/20100101 Firefox/59.0 %s/%s (%s)", NAME, VERSION, AUTHOR));
-        if (args.length == 0) {
-            launch(args);
+        launch(args);
+    }
+
+    @Override
+    public void stop() {
+        EXECUTOR_SERVICE.shutdown();
+    }
+
+    public static void openBrowser(String url) {
+        if (Desktop.isDesktopSupported()) {
+            EXECUTOR_SERVICE.execute(() -> {
+                try {
+                    Desktop.getDesktop().browse(new URI(url));
+                } catch (IOException | URISyntaxException e) {
+                    Platform.runLater(() -> new Alert(Alert.AlertType.ERROR, "Can't open URL", ButtonType.OK).show());
+                    e.printStackTrace();
+                }
+            });
         } else {
-            // DO SOMETHING
+            new Alert(Alert.AlertType.ERROR, "Desktop not supported", ButtonType.OK).show();
         }
     }
 }
