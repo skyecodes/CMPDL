@@ -5,6 +5,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class ModpackManifest {
 
@@ -64,13 +65,19 @@ public class ModpackManifest {
                 name.replaceAll("%", ""), version.replaceAll("%", ""), author.replaceAll("%", ""), mcVersion, mods.size(), forge);
     }
 
-    public class ModpackManifestMod {
+    public static class ModpackManifestMod {
 
         private final int projectId, fileId;
 
-        private ModpackManifestMod(JSONObject json) {
+        public ModpackManifestMod(JSONObject json) {
             projectId = json.getInt("projectID");
             fileId = json.getInt("fileID");
+        }
+
+        public ModpackManifestMod(String line) {
+            String[] split = line.split(":");
+            projectId = Integer.parseInt(split[0]);
+            fileId = Integer.parseInt(split[1]);
         }
 
         public int getProjectId() {
@@ -79,6 +86,20 @@ public class ModpackManifest {
 
         public int getFileId() {
             return fileId;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            ModpackManifestMod that = (ModpackManifestMod) o;
+            return projectId == that.projectId &&
+                    fileId == that.fileId;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(projectId, fileId);
         }
     }
 }

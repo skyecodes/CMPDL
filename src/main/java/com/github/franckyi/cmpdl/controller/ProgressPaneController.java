@@ -23,7 +23,7 @@ public class ProgressPaneController implements Initializable, IContentController
 
     private Project project;
     private ProjectFile projectFile;
-    private File destination, zipFile, unzipFolder, minecraft, modsFolder, temp;
+    private File destination, zipFile, unzipFolder, minecraft, modsFolder, temp, progressFile;
     private ModpackManifest manifest;
 
     @FXML
@@ -80,7 +80,6 @@ public class ProgressPaneController implements Initializable, IContentController
             if (buttonType.orElse(null) == ButtonType.YES) {
                 if (task2 != null) task2.cancel();
                 if (task1 != null) task1.cancel();
-                new CleanTask(temp).run();
                 Platform.exit();
             }
         } else {
@@ -98,6 +97,7 @@ public class ProgressPaneController implements Initializable, IContentController
         modsFolder.mkdirs();
         temp = new File(destination, ".cmpdl_temp");
         temp.mkdirs();
+        progressFile = new File(temp, ".progress");
         zipFile = new File(temp, projectFile.getFileNameOnDisk());
         unzipFolder = new File(temp, projectFile.getFileNameOnDisk().replace(".zip", ""));
         unzipFolder.mkdirs();
@@ -134,28 +134,41 @@ public class ProgressPaneController implements Initializable, IContentController
         Platform.runLater(() -> console.appendText(s0 + "\n"));
     }
 
+    public void start() {
+        if (progressFile.exists()) {
+            readManifest();
+        } else {
+            downloadModpack();
+        }
+    }
+
     public void downloadModpack() {
         log("Downloading modpack");
         DownloadFileTask task = new DownloadFileTask(projectFile.getDownloadUrl(), new File(temp, projectFile.getFileNameOnDisk()));
-        task.setOnSucceeded(e -> unzipModpack());
+        task.setOnSucceeded(e -> {
+            log("Modpack downloaded successfully");
+            unzipModpack();
+        });
         setTask1(task);
         CMPDL.EXECUTOR_SERVICE.execute(task);
     }
 
     private void unzipModpack() {
-        log("Modpack downloaded successfully");
         log("Unzipping modpack");
         UnzipFileTask task = new UnzipFileTask(zipFile, unzipFolder);
-        task.setOnSucceeded(e -> readManifest());
+        task.setOnSucceeded(e -> {
+            log("Modpack unzipped successfully");
+            readManifest();
+        });
         setTask1(task);
         CMPDL.EXECUTOR_SERVICE.execute(task);
     }
 
     private void readManifest() {
-        log("Modpack unzipped successfully");
         log("Reading manifest");
         ReadManifestTask task = new ReadManifestTask(new File(unzipFolder, "manifest.json"));
         task.setOnSucceeded(e -> task.getValue().ifPresent(manifest -> {
+            log("Manifest read successfully");
             this.manifest = manifest;
             log("### Manifest content :");
             log(manifest.toString());
@@ -166,10 +179,12 @@ public class ProgressPaneController implements Initializable, IContentController
     }
 
     private void downloadMods() {
-        log("Manifest read successfully");
         log("Downloading mods");
-        DownloadModsTask task = new DownloadModsTask(modsFolder, manifest.getMods());
-        task.setOnSucceeded(e -> copyOverrides());
+        DownloadModsTask task = new DownloadModsTask(modsFolder, progressFile, manifest.getMods());
+        task.setOnSucceeded(e -> {
+            log("Downloaded mods successfully");
+            copyOverrides();
+        });
         setTask1(task);
         task.taskProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) setTask2(newValue);
@@ -179,16 +194,17 @@ public class ProgressPaneController implements Initializable, IContentController
 
     private void copyOverrides() {
         setTask2(null);
-        log("Downloaded mods successfully");
         log("Copying overrides");
         CopyOverridesTask task = new CopyOverridesTask(new File(unzipFolder, manifest.getOverrides()), minecraft);
-        task.setOnSucceeded(e -> clean());
+        task.setOnSucceeded(e -> {
+            log("Copied overrides successfully");
+            clean();
+        });
         setTask1(task);
         CMPDL.EXECUTOR_SERVICE.execute(task);
     }
 
     private void clean() {
-        log("Copied overrides successfully");
         log("Cleaning");
         CleanTask task = new CleanTask(temp);
         task.setOnSucceeded(e -> finish());

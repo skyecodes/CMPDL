@@ -50,6 +50,7 @@ public class CMPDL extends Application {
         scene = new Scene(mainWindow.getView());
         stage.setScene(scene);
         stage.setTitle(TITLE);
+        stage.setOnCloseRequest(e -> currentContent.getController().handleClose());
         stage.show();
     }
 

@@ -92,7 +92,9 @@ public class DestinationPaneController implements Initializable, IContentControl
     public void handleStart() {
         File dst = new File(destinationField.getText());
         if (dst.isDirectory()) {
-            if (!dst.exists()) dst.mkdirs();
+            if (!dst.exists()) {
+                dst.mkdirs();
+            }
             if (!dst.canWrite()) {
                 new Alert(Alert.AlertType.ERROR, "Permission denied. Please choose another destination folder.", ButtonType.OK).show();
             } else {
@@ -100,7 +102,7 @@ public class DestinationPaneController implements Initializable, IContentControl
                 CMPDL.mainWindow.getController().setContent(CMPDL.progressPane);
                 CMPDL.mainWindow.getController().getStartButton().setDisable(true);
                 CMPDL.mainWindow.getController().getPreviousButton().setDisable(true);
-                CMPDL.progressPane.getController().downloadModpack();
+                CMPDL.progressPane.getController().start();
             }
         } else {
             new Alert(Alert.AlertType.ERROR, "The destination must be a folder.", ButtonType.OK).show();
