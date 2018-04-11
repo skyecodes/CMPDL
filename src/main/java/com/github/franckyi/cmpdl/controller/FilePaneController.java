@@ -108,6 +108,8 @@ public class FilePaneController implements Initializable, IContentController {
 
     @Override
     public void handlePrevious() {
+        CMPDL.mainWindow.getController().getStartButton().disableProperty().bind(CMPDL.modpackPane.getController().getZipButton().selectedProperty().not());
+        CMPDL.mainWindow.getController().getNextButton().disableProperty().bind(CMPDL.modpackPane.getController().getZipButton().selectedProperty());
         CMPDL.mainWindow.getController().setContent(CMPDL.modpackPane);
         CMPDL.mainWindow.getController().getNextButton().setDisable(false);
         CMPDL.mainWindow.getController().getPreviousButton().setDisable(true);

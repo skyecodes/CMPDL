@@ -54,6 +54,8 @@ public class MainWindowController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         setContent(CMPDL.modpackPane);
+        startButton.disableProperty().bind(CMPDL.modpackPane.getController().getZipButton().selectedProperty().not());
+        nextButton.disableProperty().bind(CMPDL.modpackPane.getController().getZipButton().selectedProperty());
     }
 
     public void setContent(ContentControllerView<?> cv) {

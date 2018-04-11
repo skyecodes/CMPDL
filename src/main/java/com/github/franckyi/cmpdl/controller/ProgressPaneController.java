@@ -103,6 +103,20 @@ public class ProgressPaneController implements Initializable, IContentController
         unzipFolder.mkdirs();
     }
 
+    public void setData(File zipFile, File dstFolder) {
+        this.zipFile = zipFile;
+        this.destination = dstFolder;
+        minecraft = new File(destination, "minecraft");
+        minecraft.mkdirs();
+        modsFolder = new File(minecraft, "mods");
+        modsFolder.mkdirs();
+        temp = new File(destination, ".cmpdl_temp");
+        temp.mkdirs();
+        progressFile = new File(temp, ".progress");
+        unzipFolder = new File(temp, zipFile.getName().replace(".zip", ""));
+        unzipFolder.mkdirs();
+    }
+
     public void setTask1(Task<?> task) {
         task1 = task;
         bind(task, subLabel1, progressBar1, progressIndicator1);
@@ -153,7 +167,7 @@ public class ProgressPaneController implements Initializable, IContentController
         CMPDL.EXECUTOR_SERVICE.execute(task);
     }
 
-    private void unzipModpack() {
+    public void unzipModpack() {
         log("Unzipping modpack");
         UnzipFileTask task = new UnzipFileTask(zipFile, unzipFolder);
         task.setOnSucceeded(e -> {
