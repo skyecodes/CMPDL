@@ -59,11 +59,17 @@ public class DownloadModsTask extends TaskBase<Void> {
                     DownloadFileTask task = new DownloadFileTask(file.getDownloadUrl(), new File(modsFolder, file.getFileNameOnDisk()));
                     setTask(task);
                     CMPDL.progressPane.getController().log("Downloading file %s", file.getFileName().replaceAll("%", ""));
+                    task.setOnSucceeded(e -> {
+                        try {
+                            writer.write(String.format("%d:%d\n", mod.getProjectId(), mod.getFileId()));
+                        } catch (IOException e1) {
+                            e1.printStackTrace();
+                        }
+                    });
                     task.run();
                 } else {
                     CMPDL.progressPane.getController().log("!!! Unknown file %d:%d - skipping !!!", mod.getProjectId(), mod.getFileId());
                 }
-                writer.write(String.format("%d:%d\n", mod.getProjectId(), mod.getFileId()));
             }
         }
         return null;
