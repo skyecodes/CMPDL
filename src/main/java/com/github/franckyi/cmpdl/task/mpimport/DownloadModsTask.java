@@ -46,7 +46,7 @@ public class DownloadModsTask extends TaskBase<Void> {
         }
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(progressFile, true))) {
             for (int i = start; i < max; i++) {
-                updateProgress(start, max);
+                updateProgress(i, max);
                 if (isCancelled()) {
                     writer.close();
                     return null;
