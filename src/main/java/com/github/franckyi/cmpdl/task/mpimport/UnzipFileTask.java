@@ -1,29 +1,30 @@
-package com.github.franckyi.cmpdl.task;
+package com.github.franckyi.cmpdl.task.mpimport;
+
+import com.github.franckyi.cmpdl.task.TaskBase;
 
 import java.io.*;
 import java.nio.channels.FileChannel;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-public class UnzipModpackTask extends CustomTask<Void> {
+public class UnzipFileTask extends TaskBase<Void> {
 
-    private final File zipfile;
-    private final File folder;
+    private final File src, dst;
 
-    UnzipModpackTask(File file) {
-        this.zipfile = file;
-        this.folder = file.getParentFile();
+    public UnzipFileTask(File src, File dst) {
+        this.src = src;
+        this.dst = dst;
     }
 
     @Override
-    protected Void call0() throws Exception {
-        log("Unzipping file at " + folder.getAbsolutePath());
-        FileInputStream is = new FileInputStream(zipfile.getCanonicalFile());
+    protected Void call0() throws Throwable {
+        updateTitle(String.format("Unzipping %s", src.getName()));
+        FileInputStream is = new FileInputStream(src.getCanonicalFile());
         FileChannel channel = is.getChannel();
         ZipEntry ze;
         try (ZipInputStream zis = new ZipInputStream(new BufferedInputStream(is))) {
             while ((ze = zis.getNextEntry()) != null && !isCancelled()) {
-                File f = new File(folder.getCanonicalPath(), ze.getName());
+                File f = new File(dst.getCanonicalPath(), ze.getName());
                 if (ze.isDirectory()) {
                     f.mkdirs();
                     continue;
@@ -34,7 +35,7 @@ public class UnzipModpackTask extends CustomTask<Void> {
                         final byte[] buf = new byte[1024];
                         int bytesRead;
                         long nread = 0L;
-                        long length = zipfile.length();
+                        long length = src.length();
                         while (-1 != (bytesRead = zis.read(buf)) && !isCancelled()) {
                             fos.write(buf, 0, bytesRead);
                             nread += bytesRead;
@@ -49,13 +50,5 @@ public class UnzipModpackTask extends CustomTask<Void> {
         }
         updateProgress(0, 0);
         return null;
-    }
-
-    @Override
-    protected void succeeded() {
-        DownloadModsTask task = new DownloadModsTask(folder);
-        getController().setPrimaryProgress(task, "Step 2/3 : Downloading dependencies");
-        new Thread(task).start();
-        log("Unzipping succeeded !");
     }
 }

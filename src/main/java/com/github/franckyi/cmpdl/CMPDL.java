@@ -1,85 +1,78 @@
 package com.github.franckyi.cmpdl;
 
+import com.github.franckyi.cmpdl.controller.*;
+import com.github.franckyi.cmpdl.core.ContentControllerView;
+import com.github.franckyi.cmpdl.core.ControllerView;
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
+import javafx.application.Platform;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 
-import java.io.File;
-import java.net.URL;
-import java.util.HashSet;
-import java.util.Set;
+import java.awt.*;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class CMPDL extends Application {
 
-    private static final String NAME = "Curse Modpack Downloader";
-    private static final String VERSION = "2.0.0";
-    private static final String AUTHOR = "Franckyi (original version by Vazkii)";
+    public static final String NAME = "CMPDL";
+    public static final String VERSION = "2.1.0";
+    public static final String AUTHOR = "Franckyi";
+    public static final String TITLE = String.format("%s v%s by %s", NAME, VERSION, AUTHOR);
 
-    public static String title() {
-        return String.format("%s v%s by %s", NAME, VERSION, AUTHOR);
-    }
+    public static final String USER_AGENT = String.format("Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:59.0) Gecko/20100101 Firefox/59.0 %s/%s (%s)", NAME, VERSION, AUTHOR);
 
-    public static InterfaceController controller;
-    public static Parent parent;
+    public static final ExecutorService EXECUTOR_SERVICE = Executors.newCachedThreadPool();
+
     public static Stage stage;
 
-    public static String path;
-    public static String zipFileName;
+    public static ControllerView<MainWindowController> mainWindow;
+    public static ContentControllerView<ModpackPaneController> modpackPane;
+    public static ContentControllerView<FilePaneController> filePane;
+    public static ContentControllerView<DestinationPaneController> destinationPane;
+    public static ContentControllerView<ProgressPaneController> progressPane;
 
-    public static final Set<Exception> exceptions = new HashSet<>();
-
-    public void start(Stage primaryStage) throws Exception {
-        stage = primaryStage;
-        URL interface0 = getClass().getClassLoader().getResource("interface.fxml");
-        if (interface0 != null) {
-            FXMLLoader loader = new FXMLLoader(interface0);
-            parent = loader.load();
-            controller = loader.getController();
-            stage.setScene(new Scene(parent));
-            stage.setResizable(false);
-            stage.setTitle(title());
-            stage.show();
-        } else {
-            throw new RuntimeException("Impossible to load interface.fxml file : the application can't start");
-        }
-    }
+    public static ContentControllerView<?> currentContent;
 
     @Override
-    public void stop() throws Exception {
-        controller.stop(null);
+    public void start(Stage primaryStage) throws Exception {
+        stage = primaryStage;
+        modpackPane = new ContentControllerView<>("ModpackPane.fxml");
+        filePane = new ContentControllerView<>("FilePane.fxml");
+        destinationPane = new ContentControllerView<>("DestinationPane.fxml");
+        progressPane = new ContentControllerView<>("ProgressPane.fxml");
+        mainWindow = new ControllerView<>("MainWindow.fxml");
+        stage.setScene(new Scene(mainWindow.getView()));
+        stage.setTitle(TITLE);
+        stage.setOnCloseRequest(e -> currentContent.getController().handleClose());
+        stage.show();
     }
 
     public static void main(String[] args) {
         launch(args);
     }
 
-    public static String getTempDirectory() {
-        return path + File.separator + ".cmpdl_temp";
+    @Override
+    public void stop() {
+        EXECUTOR_SERVICE.shutdown();
     }
 
-    public static String getZipFile() {
-        return getTempDirectory() + File.separator + zipFileName;
-    }
-
-    private static String getMinecraftDirectory() {
-        return path + File.separator + "minecraft";
-    }
-
-    public static String getModsDirectory() {
-        return getMinecraftDirectory() + File.separator + "mods";
-    }
-
-    public static String getInstanceFile() {
-        return path + File.separator + "instance.cfg";
-    }
-
-    public static String getManifestFile() {
-        return getTempDirectory() + File.separator + "manifest.json";
-    }
-
-    public static String toOverridePath(File file, String override) {
-        return file.getPath().replace(".cmpdl_temp" + File.separator + override, "minecraft");
+    public static void openBrowser(String url) {
+        if (Desktop.isDesktopSupported()) {
+            EXECUTOR_SERVICE.execute(() -> {
+                try {
+                    Desktop.getDesktop().browse(new URI(url));
+                } catch (IOException | URISyntaxException e) {
+                    Platform.runLater(() -> new Alert(Alert.AlertType.ERROR, "Can't open URL", ButtonType.OK).show());
+                    e.printStackTrace();
+                }
+            });
+        } else {
+            new Alert(Alert.AlertType.ERROR, "Desktop not supported", ButtonType.OK).show();
+        }
     }
 }
