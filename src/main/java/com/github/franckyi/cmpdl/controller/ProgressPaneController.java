@@ -2,7 +2,6 @@ package com.github.franckyi.cmpdl.controller;
 
 import com.github.franckyi.cmpdl.CMPDL;
 import com.github.franckyi.cmpdl.model.ModpackManifest;
-import com.github.franckyi.cmpdl.model.Project;
 import com.github.franckyi.cmpdl.model.ProjectFile;
 import com.github.franckyi.cmpdl.task.mpimport.*;
 import javafx.application.Platform;
@@ -21,7 +20,6 @@ public class ProgressPaneController implements Initializable, IContentController
     private Task<?> task1, task2;
     private boolean done = false;
 
-    private Project project;
     private ProjectFile projectFile;
     private File destination, zipFile, unzipFolder, minecraft, modsFolder, temp, progressFile;
     private ModpackManifest manifest;
@@ -87,8 +85,7 @@ public class ProgressPaneController implements Initializable, IContentController
         }
     }
 
-    public void setData(Project project, ProjectFile projectFile, File destination) {
-        this.project = project;
+    public void setData(ProjectFile projectFile, File destination) {
         this.projectFile = projectFile;
         this.destination = destination;
         minecraft = new File(destination, "minecraft");
@@ -117,12 +114,12 @@ public class ProgressPaneController implements Initializable, IContentController
         unzipFolder.mkdirs();
     }
 
-    public void setTask1(Task<?> task) {
+    private void setTask1(Task<?> task) {
         task1 = task;
         bind(task, subLabel1, progressBar1, progressIndicator1);
     }
 
-    public void setTask2(Task<?> task) {
+    private void setTask2(Task<?> task) {
         task2 = task;
         bind(task, subLabel2, progressBar2, progressIndicator2);
     }
@@ -156,7 +153,7 @@ public class ProgressPaneController implements Initializable, IContentController
         }
     }
 
-    public void downloadModpack() {
+    private void downloadModpack() {
         log("Downloading modpack");
         DownloadFileTask task = new DownloadFileTask(projectFile.getDownloadUrl(), new File(temp, projectFile.getFileNameOnDisk()));
         task.setOnSucceeded(e -> {

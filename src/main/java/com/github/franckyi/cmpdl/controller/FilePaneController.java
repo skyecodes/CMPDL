@@ -15,6 +15,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.VBox;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -43,12 +44,41 @@ public class FilePaneController implements Initializable, IContentController {
     private Label categoryLabel;
 
     @FXML
+    private ToggleGroup file;
+
+    @FXML
+    private RadioButton directButton;
+
+    @FXML
+    private VBox directPane;
+
+    @FXML
     private ListView<IProjectFile> filesListView;
 
     @FXML
     private Button changeViewButton;
 
-    public void viewAllFiles() {
+    @FXML
+    private RadioButton idButton;
+
+    @FXML
+    private TextField idField;
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        directPane.disableProperty().bind(directButton.selectedProperty().not());
+        idField.disableProperty().bind(idButton.selectedProperty().not());
+        filesListView.setCellFactory(param -> new ProjectFileMinimalView());
+        filesListView.getSelectionModel().getSelectedItems().addListener((ListChangeListener<? super IProjectFile>) c -> {
+            if (CMPDL.currentContent == CMPDL.filePane && directButton.isSelected()) {
+                CMPDL.mainWindow.getController().getNextButton().setDisable(c.getList().size() != 1);
+            }
+        });
+        idButton.selectedProperty().addListener((observable, oldValue, newValue) ->
+                CMPDL.mainWindow.getController().getNextButton().setDisable(!newValue && filesListView.getSelectionModel().getSelectedItems().isEmpty()));
+    }
+
+    private void viewAllFiles() {
         if (files != null) {
             filesListView.getItems().setAll(files);
             changeViewButton.setText("View latest files...");
@@ -65,16 +95,6 @@ public class FilePaneController implements Initializable, IContentController {
     @FXML
     void actionViewInBrowser(ActionEvent event) {
         CMPDL.openBrowser(project.getUrl());
-    }
-
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        filesListView.setCellFactory(param -> new ProjectFileMinimalView());
-        filesListView.getSelectionModel().getSelectedItems().addListener((ListChangeListener<? super IProjectFile>) c -> {
-            if (CMPDL.currentContent == CMPDL.filePane) {
-                CMPDL.mainWindow.getController().getNextButton().setDisable(c.getList().size() != 1);
-            }
-        });
     }
 
     public void setProject(Project project) {
@@ -96,7 +116,8 @@ public class FilePaneController implements Initializable, IContentController {
     public void handleNext() {
         Alert alert = new Alert(Alert.AlertType.INFORMATION, "Loading file data...", ButtonType.CLOSE);
         alert.show();
-        GetProjectFileTask task = new GetProjectFileTask(project.getProjectId(), filesListView.getSelectionModel().getSelectedItem().getFileId());
+        int fileId = file.getSelectedToggle() == directButton ? filesListView.getSelectionModel().getSelectedItem().getFileId() : Integer.parseInt(idField.getText());
+        GetProjectFileTask task = new GetProjectFileTask(project.getProjectId(), fileId);
         task.setOnSucceeded(e -> Platform.runLater(() -> task.getValue().ifPresent(file -> {
             CMPDL.destinationPane.getController().setProjectAndFile(project, file);
             CMPDL.mainWindow.getController().setContent(CMPDL.destinationPane);

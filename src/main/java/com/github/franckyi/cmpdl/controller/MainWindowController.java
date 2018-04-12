@@ -65,10 +65,6 @@ public class MainWindowController implements Initializable {
         CMPDL.stage.sizeToScene();
     }
 
-    public Button getCloseButton() {
-        return closeButton;
-    }
-
     public Button getPreviousButton() {
         return previousButton;
     }

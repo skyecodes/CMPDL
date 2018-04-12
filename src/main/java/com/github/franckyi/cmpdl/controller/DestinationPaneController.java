@@ -98,7 +98,7 @@ public class DestinationPaneController implements Initializable, IContentControl
             if (!dst.canWrite()) {
                 new Alert(Alert.AlertType.ERROR, "Permission denied. Please choose another destination folder.", ButtonType.OK).show();
             } else {
-                CMPDL.progressPane.getController().setData(project, file, dst);
+                CMPDL.progressPane.getController().setData(file, dst);
                 CMPDL.mainWindow.getController().setContent(CMPDL.progressPane);
                 CMPDL.mainWindow.getController().getStartButton().setDisable(true);
                 CMPDL.mainWindow.getController().getPreviousButton().setDisable(true);

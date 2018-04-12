@@ -19,7 +19,7 @@ public class DownloadModsTask extends TaskBase<Void> {
     private final File modsFolder, progressFile;
     private final List<ModpackManifest.ModpackManifestMod> mods;
 
-    private ObjectProperty<Task<?>> task = new SimpleObjectProperty<>();
+    private final ObjectProperty<Task<?>> task = new SimpleObjectProperty<>();
 
     public DownloadModsTask(File modsFolder, File progressFile, List<ModpackManifest.ModpackManifestMod> mods) {
         this.modsFolder = modsFolder;
@@ -31,7 +31,7 @@ public class DownloadModsTask extends TaskBase<Void> {
     protected Void call0() throws IOException {
         int max = mods.size();
         int start = 0;
-        if (progressFile != null && progressFile.exists() && progressFile.isFile()) {
+        if (progressFile.exists() && progressFile.isFile()) {
             BufferedReader reader = new BufferedReader(new FileReader(progressFile));
             String line;
             while ((line = reader.readLine()) != null && !isCancelled()) {

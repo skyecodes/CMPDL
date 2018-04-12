@@ -29,7 +29,6 @@ public class CMPDL extends Application {
     public static final ExecutorService EXECUTOR_SERVICE = Executors.newCachedThreadPool();
 
     public static Stage stage;
-    public static Scene scene;
 
     public static ControllerView<MainWindowController> mainWindow;
     public static ContentControllerView<ModpackPaneController> modpackPane;
@@ -47,8 +46,7 @@ public class CMPDL extends Application {
         destinationPane = new ContentControllerView<>("DestinationPane.fxml");
         progressPane = new ContentControllerView<>("ProgressPane.fxml");
         mainWindow = new ControllerView<>("MainWindow.fxml");
-        scene = new Scene(mainWindow.getView());
-        stage.setScene(scene);
+        stage.setScene(new Scene(mainWindow.getView()));
         stage.setTitle(TITLE);
         stage.setOnCloseRequest(e -> currentContent.getController().handleClose());
         stage.show();

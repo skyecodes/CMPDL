@@ -25,15 +25,6 @@ public class CopyOverridesTask extends TaskBase<Void> {
         return null;
     }
 
-    public static void copyFileOrFolder(File source, File dest, CopyOption... options) throws IOException {
-        if (source.isDirectory())
-            copyFolder(source, dest, options);
-        else {
-            ensureParentFolder(dest);
-            copyFile(source, dest, options);
-        }
-    }
-
     private static void copyFolder(File source, File dest, CopyOption... options) throws IOException {
         if (!dest.exists())
             dest.mkdirs();
@@ -53,9 +44,4 @@ public class CopyOverridesTask extends TaskBase<Void> {
         Files.copy(source.toPath(), dest.toPath(), options);
     }
 
-    private static void ensureParentFolder(File file) {
-        File parent = file.getParentFile();
-        if (parent != null && !parent.exists())
-            parent.mkdirs();
-    }
 }

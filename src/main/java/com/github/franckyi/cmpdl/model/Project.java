@@ -17,7 +17,7 @@ public class Project {
     private final String url;
     private final String categoryName;
     private final String categoryLogoUrl;
-    private final boolean mod, modpack;
+    private final boolean modpack;
     private final List<ProjectFileMinimal> files;
 
     public Project(JSONObject json) {
@@ -29,7 +29,6 @@ public class Project {
         url = json.getString("WebSiteURL");
         categoryName = json.getString("PrimaryCategoryName");
         categoryLogoUrl = json.getString("PrimaryCategoryAvatarUrl");
-        mod = "Mod".equals(json.getString("PackageType"));
         modpack = "ModPack".equals(json.getString("PackageType"));
         JSONArray array = json.getJSONArray("GameVersionLatestFiles");
         files = new ArrayList<>(array.length());
@@ -69,10 +68,6 @@ public class Project {
 
     public String getCategoryLogoUrl() {
         return categoryLogoUrl;
-    }
-
-    public boolean isMod() {
-        return mod;
     }
 
     public boolean isModpack() {
