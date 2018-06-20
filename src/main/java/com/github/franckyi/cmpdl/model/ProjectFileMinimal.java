@@ -10,6 +10,8 @@ public class ProjectFileMinimal implements IProjectFile {
     private final int fileId;
 
     public ProjectFileMinimal(JSONObject json) {
+        if (json.has("error") && json.getBoolean("error"))
+            throw new IllegalArgumentException("Error " + json.getInt("status"));
         fileName = json.getString("ProjectFileName");
         gameVersion = json.getString("GameVesion");
         fileType = json.getString("FileType");

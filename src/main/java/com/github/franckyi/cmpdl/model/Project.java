@@ -21,6 +21,8 @@ public class Project {
     private final List<ProjectFileMinimal> files;
 
     public Project(JSONObject json) {
+        if (json.has("error") && json.getBoolean("error"))
+            throw new IllegalArgumentException("Error " + json.getInt("status"));
         projectId = json.getInt("Id");
         name = json.getString("Name");
         author = json.getString("PrimaryAuthorName");

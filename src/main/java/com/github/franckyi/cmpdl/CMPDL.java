@@ -20,11 +20,11 @@ import java.util.concurrent.Executors;
 public class CMPDL extends Application {
 
     public static final String NAME = "CMPDL";
-    public static final String VERSION = "2.1.1";
+    public static final String VERSION = "2.1.1-hotfix";
     public static final String AUTHOR = "Franckyi";
     public static final String TITLE = String.format("%s v%s by %s", NAME, VERSION, AUTHOR);
 
-    public static final String USER_AGENT = String.format("Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:59.0) Gecko/20100101 Firefox/59.0 %s/%s (%s)", NAME, VERSION, AUTHOR);
+    public static final String USER_AGENT = String.format("Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/60.0 %s/%s (%s)", NAME, VERSION, AUTHOR);
 
     public static final ExecutorService EXECUTOR_SERVICE = Executors.newCachedThreadPool();
 

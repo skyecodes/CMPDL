@@ -18,7 +18,8 @@ import java.io.IOException;
 public class CurseMetaAPI {
 
     private static final OkHttpClient CLIENT = new OkHttpClient();
-    private static final String URL = "http://cursemeta.dries007.net/api/v2/direct";
+    //private static final String URL = "http://cursemeta.dries007.net/api/v2/direct";
+    private static final String URL = "http://cursemeta.dries007.net";
 
     public static Project getProject(int projectId) {
         try {
@@ -40,9 +41,21 @@ public class CurseMetaAPI {
         }
     }
 
+    /*
     public static ProjectFile getProjectFile(int projectId, int fileId) {
         try {
             return new ProjectFile(new JSONObject(get("/GetAddOnFile", projectId, fileId)));
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Platform.runLater(() -> new Alert(Alert.AlertType.ERROR, String.format("Unknown project file (%d:%d)", projectId, fileId), ButtonType.OK).show());
+            return null;
+        }
+    }
+    */
+
+    public static ProjectFile getProjectFile(int projectId, int fileId) {
+        try {
+            return new ProjectFile(new JSONObject(get(String.format("/%d/%d.json", projectId, fileId))));
         } catch (JSONException e) {
             e.printStackTrace();
             Platform.runLater(() -> new Alert(Alert.AlertType.ERROR, String.format("Unknown project file (%d:%d)", projectId, fileId), ButtonType.OK).show());
