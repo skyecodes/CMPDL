@@ -24,7 +24,8 @@ public class CMPDL extends Application {
     public static final String AUTHOR = "Franckyi";
     public static final String TITLE = String.format("%s v%s by %s", NAME, VERSION, AUTHOR);
 
-    public static final String USER_AGENT = String.format("Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:59.0) Gecko/20100101 Firefox/59.0 %s/%s (%s)", NAME, VERSION, AUTHOR);
+    // As per the "Required reading" section on https://staging_cursemeta.dries007.net/docs
+    public static final String USER_AGENT = String.format("%s/%s (%s)", NAME, AUTHOR, VERSION);
 
     public static final ExecutorService EXECUTOR_SERVICE = Executors.newCachedThreadPool();
 

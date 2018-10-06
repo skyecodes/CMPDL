@@ -18,11 +18,12 @@ import java.io.IOException;
 public class CurseMetaAPI {
 
     private static final OkHttpClient CLIENT = new OkHttpClient();
-    private static final String URL = "http://cursemeta.dries007.net/api/v2/direct";
+    // Docs: https://staging_cursemeta.dries007.net/docs
+    private static final String URL = "https://staging_cursemeta.dries007.net/api/v3/direct";
 
     public static Project getProject(int projectId) {
         try {
-            return new Project(new JSONObject(get("/GetAddOn", projectId)));
+            return new Project(new JSONObject(get("/addon", projectId)));
         } catch (JSONException e) {
             e.printStackTrace();
             Platform.runLater(() -> new Alert(Alert.AlertType.ERROR, String.format("Unknown project (%d)", projectId), ButtonType.OK).show());
@@ -32,7 +33,7 @@ public class CurseMetaAPI {
 
     public static ProjectFilesList getProjectFiles(int projectId) {
         try {
-            return new ProjectFilesList(new JSONArray(get("/GetAllFilesForAddOn", projectId)));
+            return new ProjectFilesList(new JSONArray(get("/addon", projectId, "/files")));
         } catch (JSONException e) {
             e.printStackTrace();
             Platform.runLater(() -> new Alert(Alert.AlertType.ERROR, String.format("Unknown project (%d)", projectId), ButtonType.OK).show());
@@ -42,7 +43,7 @@ public class CurseMetaAPI {
 
     public static ProjectFile getProjectFile(int projectId, int fileId) {
         try {
-            return new ProjectFile(new JSONObject(get("/GetAddOnFile", projectId, fileId)));
+            return new ProjectFile(new JSONObject(get("/addon", projectId, "/file", fileId)));
         } catch (JSONException e) {
             e.printStackTrace();
             Platform.runLater(() -> new Alert(Alert.AlertType.ERROR, String.format("Unknown project file (%d:%d)", projectId, fileId), ButtonType.OK).show());

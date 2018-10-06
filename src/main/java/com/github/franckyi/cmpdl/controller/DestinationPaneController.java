@@ -59,6 +59,10 @@ public class DestinationPaneController implements Initializable, IContentControl
     void actionChooseDestination(ActionEvent event) {
         DirectoryChooser dc = new DirectoryChooser();
         dc.setTitle("Choose the destination folder :");
+        String currentChosenDirectory = destinationField.getText();
+        if (currentChosenDirectory != null && ! "".equals(currentChosenDirectory)) {
+            dc.setInitialDirectory(new File(currentChosenDirectory));
+        }
         File dst = dc.showDialog(CMPDL.stage);
         if (dst != null) {
             destinationField.setText(dst.getAbsolutePath());
@@ -120,7 +124,7 @@ public class DestinationPaneController implements Initializable, IContentControl
         categoryLabel.setText(project.getCategoryName());
         fileNameLabel.setText(file.getFileName());
         mcVersionLabel.setText(file.getGameVersion());
-        releaseTypeLabel.setText(file.getFileType());
+        releaseTypeLabel.setText(file.getFileType().toString());
         releaseTypeLabel.setTextFill(file.getColor());
     }
 }
