@@ -6,14 +6,19 @@ public class ProjectFileMinimal implements IProjectFile {
 
     private final String fileName;
     private final String gameVersion;
-    private final String fileType;
+    private FileReleaseType fileType;
     private final int fileId;
 
-    public ProjectFileMinimal(JSONObject json) {
-        fileName = json.getString("ProjectFileName");
-        gameVersion = json.getString("GameVesion");
-        fileType = json.getString("FileType");
-        fileId = json.getInt("ProjectFileID");
+    ProjectFileMinimal(JSONObject json) {
+        fileName = json.getString("projectFileName");
+        gameVersion = json.getString("gameVersion");
+        try {
+            fileType = parseFileType(json.getInt("fileType"));
+        } catch (Exception e) {
+            fileType = FileReleaseType.ALPHA;
+            e.printStackTrace();
+        }
+        fileId = json.getInt("projectFileId");
     }
 
     public String getFileName() {
@@ -24,7 +29,8 @@ public class ProjectFileMinimal implements IProjectFile {
         return gameVersion;
     }
 
-    public String getFileType() {
+    @Override
+    public FileReleaseType getFileType() {
         return fileType;
     }
 

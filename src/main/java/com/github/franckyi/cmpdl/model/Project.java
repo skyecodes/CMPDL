@@ -9,6 +9,8 @@ import java.util.List;
 
 public class Project {
 
+    private static final int PACKAGE_TYPE_MODPACK = 5;
+
     private final int projectId;
     private final String name;
     private final String author;
@@ -21,16 +23,16 @@ public class Project {
     private final List<ProjectFileMinimal> files;
 
     public Project(JSONObject json) {
-        projectId = json.getInt("Id");
-        name = json.getString("Name");
-        author = json.getString("PrimaryAuthorName");
-        summary = json.getString("Summary");
-        logoUrl = json.getJSONArray("Attachments").getJSONObject(0).getString("Url");
-        url = json.getString("WebSiteURL");
-        categoryName = json.getString("PrimaryCategoryName");
-        categoryLogoUrl = json.getString("PrimaryCategoryAvatarUrl");
-        modpack = "ModPack".equals(json.getString("PackageType"));
-        JSONArray array = json.getJSONArray("GameVersionLatestFiles");
+        projectId = json.getInt("id");
+        name = json.getString("name");
+        author = json.getString("primaryAuthorName");
+        summary = json.getString("summary");
+        logoUrl = json.getJSONArray("attachments").getJSONObject(0).getString("url");
+        url = json.getString("websiteUrl");
+        categoryName = json.getString("primaryCategoryName");
+        categoryLogoUrl = json.getString("primaryCategoryAvatarUrl");
+        modpack = json.getInt("packageType") == PACKAGE_TYPE_MODPACK;
+        JSONArray array = json.getJSONArray("gameVersionLatestFiles");
         files = new ArrayList<>(array.length());
         for (int i = 0; i < array.length(); i++) {
             files.add(new ProjectFileMinimal(array.getJSONObject(i)));

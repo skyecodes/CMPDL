@@ -7,17 +7,22 @@ public class ProjectFile implements IProjectFile {
     private final String fileName;
     private final String fileNameOnDisk;
     private final String gameVersion;
-    private final String fileType;
+    private FileReleaseType fileType;
     private final int fileId;
     private final String downloadUrl;
 
     public ProjectFile(JSONObject json) {
-        fileName = json.getString("FileName");
-        fileNameOnDisk = json.getString("FileNameOnDisk");
-        gameVersion = json.getJSONArray("GameVersion").getString(0);
-        fileType = json.getString("ReleaseType");
-        fileId = json.getInt("Id");
-        downloadUrl = json.getString("DownloadURL");
+        fileName = json.getString("fileName");
+        fileNameOnDisk = json.getString("fileNameOnDisk");
+        gameVersion = json.getJSONArray("gameVersion").getString(0);
+        try {
+            fileType = parseFileType(json.getInt("releaseType"));
+        } catch (Exception e) {
+            fileType = FileReleaseType.ALPHA;
+            e.printStackTrace();
+        }
+        fileId = json.getInt("id");
+        downloadUrl = json.getString("downloadUrl");
     }
 
     @Override
@@ -40,7 +45,7 @@ public class ProjectFile implements IProjectFile {
     }
 
     @Override
-    public String getFileType() {
+    public FileReleaseType getFileType() {
         return fileType;
     }
 

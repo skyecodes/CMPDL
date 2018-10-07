@@ -28,7 +28,7 @@ public class ProjectFileMinimalView extends ListCell<IProjectFile> {
         } else {
             fileName.setText(item.getFileName());
             gameVersion.setText("for MC " + item.getGameVersion());
-            fileType.setText(item.getFileType());
+            fileType.setText(item.getFileType().toString());
             fileType.setTextFill(item.getColor());
             setGraphic(root);
         }
