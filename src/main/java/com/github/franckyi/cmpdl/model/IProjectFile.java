@@ -12,7 +12,6 @@ public interface IProjectFile extends Comparable<IProjectFile> {
     /**
      * Parses the integer type provided by api to FileReleaseType
      *
-     * TODO: Check if the type mapping is correct
      * @param releaseType the integer received from API
      * @return FileReleaseType
      * @throws Exception Thrown when the release type could not be determined
@@ -20,11 +19,11 @@ public interface IProjectFile extends Comparable<IProjectFile> {
     default FileReleaseType parseFileType(int releaseType) throws Exception {
         switch (releaseType) {
             case 1:
-                return FileReleaseType.ALPHA;
+                return FileReleaseType.RELEASE;
             case 2:
                 return FileReleaseType.BETA;
             case 3:
-                return FileReleaseType.RELEASE;
+                return FileReleaseType.ALPHA;
             default:
                 throw new Exception("Failed to find release type for id " + releaseType);
         }
