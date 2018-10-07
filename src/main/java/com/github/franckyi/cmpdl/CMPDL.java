@@ -20,7 +20,7 @@ import java.util.concurrent.Executors;
 public class CMPDL extends Application {
 
     public static final String NAME = "CMPDL";
-    public static final String VERSION = "2.1.1";
+    public static final String VERSION = "2.2.0";
     public static final String AUTHOR = "Franckyi";
     public static final String TITLE = String.format("%s v%s by %s", NAME, VERSION, AUTHOR);
 
@@ -42,11 +42,11 @@ public class CMPDL extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         stage = primaryStage;
-        modpackPane = new ContentControllerView<>("ModpackPane.fxml");
-        filePane = new ContentControllerView<>("FilePane.fxml");
-        destinationPane = new ContentControllerView<>("DestinationPane.fxml");
-        progressPane = new ContentControllerView<>("ProgressPane.fxml");
-        mainWindow = new ControllerView<>("MainWindow.fxml");
+        modpackPane = new ContentControllerView<>("fxml/ModpackPane.fxml");
+        filePane = new ContentControllerView<>("fxml/FilePane.fxml");
+        destinationPane = new ContentControllerView<>("fxml/DestinationPane.fxml");
+        progressPane = new ContentControllerView<>("fxml/ProgressPane.fxml");
+        mainWindow = new ControllerView<>("fxml/MainWindow.fxml");
         stage.setScene(new Scene(mainWindow.getView()));
         stage.setTitle(TITLE);
         stage.setOnCloseRequest(e -> currentContent.getController().handleClose());
