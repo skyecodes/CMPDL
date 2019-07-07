@@ -1,8 +1,8 @@
 package com.github.franckyi.cmpdl.controller;
 
 import com.github.franckyi.cmpdl.CMPDL;
+import com.github.franckyi.cmpdl.api.response.AddonFile;
 import com.github.franckyi.cmpdl.model.ModpackManifest;
-import com.github.franckyi.cmpdl.model.ProjectFile;
 import com.github.franckyi.cmpdl.task.mpimport.*;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -20,7 +20,7 @@ public class ProgressPaneController implements Initializable, IContentController
     private Task<?> task1, task2;
     private boolean done = false;
 
-    private ProjectFile projectFile;
+    private AddonFile addonFile;
     private File destination, zipFile, unzipFolder, minecraft, modsFolder, temp, progressFile;
     private ModpackManifest manifest;
 
@@ -85,8 +85,8 @@ public class ProgressPaneController implements Initializable, IContentController
         }
     }
 
-    public void setData(ProjectFile projectFile, File destination) {
-        this.projectFile = projectFile;
+    public void setData(AddonFile addonFile, File destination) {
+        this.addonFile = addonFile;
         this.destination = destination;
         minecraft = new File(destination, "minecraft");
         minecraft.mkdirs();
@@ -95,8 +95,8 @@ public class ProgressPaneController implements Initializable, IContentController
         temp = new File(destination, ".cmpdl_temp");
         temp.mkdirs();
         progressFile = new File(temp, ".progress");
-        zipFile = new File(temp, projectFile.getFileNameOnDisk());
-        unzipFolder = new File(temp, projectFile.getFileNameOnDisk().replace(".zip", ""));
+        zipFile = new File(temp, addonFile.getFileName());
+        unzipFolder = new File(temp, addonFile.getFileName().replace(".zip", ""));
         unzipFolder.mkdirs();
     }
 
@@ -155,7 +155,7 @@ public class ProgressPaneController implements Initializable, IContentController
 
     private void downloadModpack() {
         log("Downloading modpack");
-        DownloadFileTask task = new DownloadFileTask(projectFile.getDownloadUrl(), new File(temp, projectFile.getFileNameOnDisk()));
+        DownloadFileTask task = new DownloadFileTask(addonFile.getDownloadUrl(), new File(temp, addonFile.getFileName()));
         task.setOnSucceeded(e -> {
             log("Modpack downloaded successfully");
             unzipModpack();

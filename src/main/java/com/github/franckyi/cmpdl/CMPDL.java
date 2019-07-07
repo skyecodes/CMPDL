@@ -1,5 +1,7 @@
 package com.github.franckyi.cmpdl;
 
+import com.github.franckyi.cmpdl.api.CMPDLConverterFactory;
+import com.github.franckyi.cmpdl.api.TwitchAppAPI;
 import com.github.franckyi.cmpdl.controller.*;
 import com.github.franckyi.cmpdl.core.ContentControllerView;
 import com.github.franckyi.cmpdl.core.ControllerView;
@@ -9,6 +11,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
+import retrofit2.Retrofit;
 
 import java.awt.*;
 import java.io.IOException;
@@ -20,16 +23,14 @@ import java.util.concurrent.Executors;
 public class CMPDL extends Application {
 
     public static final String NAME = "CMPDL";
-    public static final String VERSION = "2.2.0";
+    public static final String VERSION = "2.3.0";
     public static final String AUTHOR = "Franckyi";
     public static final String TITLE = String.format("%s v%s by %s", NAME, VERSION, AUTHOR);
-
-    // As per the "Required reading" section on https://staging_cursemeta.dries007.net/docs
-    public static final String USER_AGENT = String.format("%s/%s (%s)", NAME, AUTHOR, VERSION);
 
     public static final ExecutorService EXECUTOR_SERVICE = Executors.newCachedThreadPool();
 
     public static Stage stage;
+    public static TwitchAppAPI api;
 
     public static ControllerView<MainWindowController> mainWindow;
     public static ContentControllerView<ModpackPaneController> modpackPane;
@@ -38,6 +39,15 @@ public class CMPDL extends Application {
     public static ContentControllerView<ProgressPaneController> progressPane;
 
     public static ContentControllerView<?> currentContent;
+
+    public static void main(String[] args) {
+        api = new Retrofit.Builder()
+            .baseUrl("https://addons-ecs.forgesvc.net/api/v2/")
+            .addConverterFactory(CMPDLConverterFactory.create())
+            .build()
+            .create(TwitchAppAPI.class);
+        launch(args);
+    }
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -53,13 +63,13 @@ public class CMPDL extends Application {
         stage.show();
     }
 
-    public static void main(String[] args) {
-        launch(args);
-    }
-
     @Override
     public void stop() {
         EXECUTOR_SERVICE.shutdown();
+    }
+
+    public static TwitchAppAPI getAPI() {
+        return api;
     }
 
     public static void openBrowser(String url) {

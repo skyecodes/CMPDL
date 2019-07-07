@@ -1,10 +1,9 @@
-package com.github.franckyi.cmpdl.task.cursemeta;
+package com.github.franckyi.cmpdl.task.api;
 
 import com.github.franckyi.cmpdl.task.TaskBase;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
-import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
@@ -27,9 +26,9 @@ public class GetProjectIdTask extends TaskBase<Integer> {
             URL url = new URL(projectUrl);
             Document doc = Jsoup.parse(url, 10000);
             if (url.getHost().equals("www.curseforge.com")) {
-                return new JSONObject(doc.select("a.button--twitch").get(0).attr("data-action-value")).getInt("ProjectID");
+                return Integer.parseInt(doc.select("div.mb-3:nth-child(2) > div:nth-child(1) > span:nth-child(2)").html());
             } else {
-                return Integer.parseInt(doc.select("ul.cf-details.project-details").get(0).child(0).child(1).html());
+                return Integer.parseInt(doc.select(".fa-icon-twitch").attr("data-id"));
             }
         } catch (MalformedURLException e) {
             e.printStackTrace();

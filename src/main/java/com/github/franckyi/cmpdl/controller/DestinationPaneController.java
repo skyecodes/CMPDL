@@ -1,17 +1,23 @@
 package com.github.franckyi.cmpdl.controller;
 
 import com.github.franckyi.cmpdl.CMPDL;
-import com.github.franckyi.cmpdl.model.Project;
-import com.github.franckyi.cmpdl.model.ProjectFile;
+import com.github.franckyi.cmpdl.api.response.Addon;
+import com.github.franckyi.cmpdl.api.response.AddonFile;
+import com.github.franckyi.cmpdl.api.response.Attachment;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.DirectoryChooser;
@@ -22,8 +28,8 @@ import java.util.ResourceBundle;
 
 public class DestinationPaneController implements Initializable, IContentController {
 
-    private Project project;
-    private ProjectFile file;
+    private Addon addon;
+    private AddonFile addonFile;
 
     @FXML
     private ImageView logoImageView;
@@ -71,7 +77,7 @@ public class DestinationPaneController implements Initializable, IContentControl
 
     @FXML
     void actionViewInBrowser(ActionEvent event) {
-        CMPDL.openBrowser(project.getUrl());
+        CMPDL.openBrowser(addon.getWebsiteUrl());
     }
 
     @Override
@@ -102,7 +108,7 @@ public class DestinationPaneController implements Initializable, IContentControl
             if (!dst.canWrite()) {
                 new Alert(Alert.AlertType.ERROR, "Permission denied. Please choose another destination folder.", ButtonType.OK).show();
             } else {
-                CMPDL.progressPane.getController().setData(file, dst);
+                CMPDL.progressPane.getController().setData(addonFile, dst);
                 CMPDL.mainWindow.getController().setContent(CMPDL.progressPane);
                 CMPDL.mainWindow.getController().getStartButton().setDisable(true);
                 CMPDL.mainWindow.getController().getPreviousButton().setDisable(true);
@@ -113,18 +119,28 @@ public class DestinationPaneController implements Initializable, IContentControl
         }
     }
 
-    public void setProjectAndFile(Project project, ProjectFile file) {
-        this.project = project;
-        this.file = file;
-        logoImageView.setImage(new Image(project.getLogoUrl()));
-        titleLabel.setText(project.getName());
-        authorLabel.setText("by " + project.getAuthor());
-        summaryLabel.setText(project.getSummary());
-        categoryImageView.setImage(new Image(project.getCategoryLogoUrl()));
-        categoryLabel.setText(project.getCategoryName());
-        fileNameLabel.setText(file.getFileName());
-        mcVersionLabel.setText(file.getGameVersion());
-        releaseTypeLabel.setText(file.getFileType().toString());
-        releaseTypeLabel.setTextFill(file.getColor());
+    public void setAddonAndFile(Addon addon, AddonFile file) {
+        this.addon = addon;
+        this.addonFile = file;
+        addon.getAttachments().stream()
+            .filter(Attachment::isDefault)
+            .findFirst()
+            .ifPresent(a -> logoImageView.setImage(new Image(a.getThumbnailUrl())));
+        titleLabel.setText(addon.getName());
+        authorLabel.setText("by " + addon.getAuthors().get(0).getName());
+        summaryLabel.setText(addon.getSummary());
+        addon.getCategories().stream()
+            .filter(category -> category.getCategoryId() == addon.getPrimaryCategoryId())
+            .findFirst()
+            .ifPresent(c -> {
+                categoryImageView.setImage(new Image(c.getAvatarUrl()));
+                categoryLabel.setText(c.getName());
+            });
+        fileNameLabel.setText(file.getDisplayName());
+        mcVersionLabel.setText(String.join(", ", file.getGameVersion()));
+        releaseTypeLabel.setText(file.getReleaseType().toString());
+        releaseTypeLabel.setBackground(new Background(new BackgroundFill(file.getReleaseType().getColor(), new CornerRadii(5), new Insets(-2, -5, -2, -5))));
+        releaseTypeLabel.setTextFill(Color.WHITE);
+
     }
 }

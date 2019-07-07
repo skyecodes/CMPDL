@@ -1,12 +1,11 @@
 package com.github.franckyi.cmpdl.controller;
 
 import com.github.franckyi.cmpdl.CMPDL;
-import com.github.franckyi.cmpdl.model.IProjectFile;
-import com.github.franckyi.cmpdl.model.Project;
-import com.github.franckyi.cmpdl.model.ProjectFilesList;
-import com.github.franckyi.cmpdl.task.cursemeta.GetProjectFileTask;
-import com.github.franckyi.cmpdl.task.cursemeta.GetProjectFilesTask;
-import com.github.franckyi.cmpdl.view.ProjectFileMinimalView;
+import com.github.franckyi.cmpdl.api.response.Addon;
+import com.github.franckyi.cmpdl.api.response.AddonFile;
+import com.github.franckyi.cmpdl.api.response.Attachment;
+import com.github.franckyi.cmpdl.task.api.CallTask;
+import com.github.franckyi.cmpdl.view.AddonFileMinimalView;
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
@@ -18,12 +17,14 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 
 import java.net.URL;
+import java.util.Comparator;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class FilePaneController implements Initializable, IContentController {
 
-    private Project project;
-    private ProjectFilesList files = null;
+    private Addon addon;
+    private List<AddonFile> files = null;
 
     @FXML
     private ImageView logoImageView;
@@ -53,7 +54,7 @@ public class FilePaneController implements Initializable, IContentController {
     private VBox directPane;
 
     @FXML
-    private ListView<IProjectFile> filesListView;
+    private ListView<AddonFile> filesListView;
 
     @FXML
     private Button changeViewButton;
@@ -68,8 +69,8 @@ public class FilePaneController implements Initializable, IContentController {
     public void initialize(URL location, ResourceBundle resources) {
         directPane.disableProperty().bind(directButton.selectedProperty().not());
         idField.disableProperty().bind(idButton.selectedProperty().not());
-        filesListView.setCellFactory(param -> new ProjectFileMinimalView());
-        filesListView.getSelectionModel().getSelectedItems().addListener((ListChangeListener<? super IProjectFile>) c -> {
+        filesListView.setCellFactory(param -> new AddonFileMinimalView());
+        filesListView.getSelectionModel().getSelectedItems().addListener((ListChangeListener<? super AddonFile>) c -> {
             if (CMPDL.currentContent == CMPDL.filePane && directButton.isSelected()) {
                 CMPDL.mainWindow.getController().getNextButton().setDisable(c.getList().size() != 1);
             }
@@ -87,28 +88,40 @@ public class FilePaneController implements Initializable, IContentController {
     }
 
     public void viewLatestFiles() {
-        filesListView.getItems().setAll(project.getFiles());
+        filesListView.getItems().setAll(addon.getLatestFiles());
         changeViewButton.setText("View all files...");
         changeViewButton.setOnAction(e -> viewAllFiles());
     }
 
     @FXML
     void actionViewInBrowser(ActionEvent event) {
-        CMPDL.openBrowser(project.getUrl());
+        CMPDL.openBrowser(addon.getWebsiteUrl());
     }
 
-    public void setProject(Project project) {
-        this.project = project;
-        logoImageView.setImage(new Image(project.getLogoUrl()));
-        titleLabel.setText(project.getName());
-        authorLabel.setText("by " + project.getAuthor());
-        summaryLabel.setText(project.getSummary());
-        categoryImageView.setImage(new Image(project.getCategoryLogoUrl()));
-        categoryLabel.setText(project.getCategoryName());
+    public void setAddon(Addon addon) {
+        this.addon = addon;
+        addon.getLatestFiles().sort(Comparator.comparing(AddonFile::getFileDate).reversed());
+        addon.getAttachments().stream()
+            .filter(Attachment::isDefault)
+            .findFirst()
+            .ifPresent(a -> logoImageView.setImage(new Image(a.getThumbnailUrl())));
+        titleLabel.setText(addon.getName());
+        authorLabel.setText("by " + addon.getAuthors().get(0).getName());
+        summaryLabel.setText(addon.getSummary());
+        addon.getCategories().stream()
+            .filter(category -> category.getCategoryId() == addon.getPrimaryCategoryId())
+            .findFirst()
+            .ifPresent(c -> {
+                categoryImageView.setImage(new Image(c.getAvatarUrl()));
+                categoryLabel.setText(c.getName());
+            });
         CMPDL.mainWindow.getController().getNextButton().setDisable(true);
         CMPDL.mainWindow.getController().getPreviousButton().setDisable(false);
-        GetProjectFilesTask task = new GetProjectFilesTask(project.getProjectId());
+        CallTask<List<AddonFile>> task = new CallTask<>(String.format("Getting addon files for addon %d", addon.getId()), CMPDL.getAPI().getAddonFiles(addon.getId()));
         task.setOnSucceeded(e -> files = task.getValue().orElse(null));
+        if (files != null) {
+            files.sort(Comparator.comparing(AddonFile::getFileDate).reversed());
+        }
         CMPDL.EXECUTOR_SERVICE.execute(task);
     }
 
@@ -116,10 +129,10 @@ public class FilePaneController implements Initializable, IContentController {
     public void handleNext() {
         Alert alert = new Alert(Alert.AlertType.INFORMATION, "Loading file data...", ButtonType.CLOSE);
         alert.show();
-        int fileId = file.getSelectedToggle() == directButton ? filesListView.getSelectionModel().getSelectedItem().getFileId() : Integer.parseInt(idField.getText());
-        GetProjectFileTask task = new GetProjectFileTask(project.getProjectId(), fileId);
+        int fileId = file.getSelectedToggle() == directButton ? filesListView.getSelectionModel().getSelectedItem().getId() : Integer.parseInt(idField.getText());
+        CallTask<AddonFile> task = new CallTask<>(String.format("Getting project file %d:%d", addon.getId(), fileId), CMPDL.getAPI().getFile(addon.getId(), fileId));
         task.setOnSucceeded(e -> Platform.runLater(() -> task.getValue().ifPresent(file -> {
-            CMPDL.destinationPane.getController().setProjectAndFile(project, file);
+            CMPDL.destinationPane.getController().setAddonAndFile(addon, file);
             CMPDL.mainWindow.getController().setContent(CMPDL.destinationPane);
             CMPDL.mainWindow.getController().getNextButton().setDisable(true);
             alert.hide();
@@ -132,6 +145,7 @@ public class FilePaneController implements Initializable, IContentController {
         CMPDL.mainWindow.getController().getStartButton().disableProperty().bind(CMPDL.modpackPane.getController().getZipButton().selectedProperty().not());
         CMPDL.mainWindow.getController().getNextButton().disableProperty().bind(CMPDL.modpackPane.getController().getZipButton().selectedProperty());
         CMPDL.mainWindow.getController().setContent(CMPDL.modpackPane);
+        CMPDL.mainWindow.getController().getNextButton().disableProperty().unbind();
         CMPDL.mainWindow.getController().getNextButton().setDisable(false);
         CMPDL.mainWindow.getController().getPreviousButton().setDisable(true);
     }

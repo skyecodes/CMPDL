@@ -1,8 +1,9 @@
 package com.github.franckyi.cmpdl.controller;
 
 import com.github.franckyi.cmpdl.CMPDL;
-import com.github.franckyi.cmpdl.task.cursemeta.GetProjectIdTask;
-import com.github.franckyi.cmpdl.task.cursemeta.GetProjectTask;
+import com.github.franckyi.cmpdl.api.response.Addon;
+import com.github.franckyi.cmpdl.task.api.CallTask;
+import com.github.franckyi.cmpdl.task.api.GetProjectIdTask;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -106,21 +107,21 @@ public class ModpackPaneController implements Initializable, IContentController 
         }
     }
 
-    public void handleNext(int projectId) {
+    public void handleNext(int addonId) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION, "Loading project data...", ButtonType.CLOSE);
         alert.show();
-        GetProjectTask task = new GetProjectTask(projectId);
-        task.setOnSucceeded(event -> Platform.runLater(() -> task.getValue().ifPresent(project -> {
-            if (project.isModpack()) {
+        CallTask<Addon> task = new CallTask<>(String.format("Getting project data for project %d", addonId), CMPDL.getAPI().getAddon(addonId));
+        task.setOnSucceeded(event -> Platform.runLater(() -> task.getValue().ifPresent(addon -> {
+            if (addon.getCategorySection().getName().equals("Modpacks")) {
                 CMPDL.mainWindow.getController().getStartButton().disableProperty().unbind();
                 CMPDL.mainWindow.getController().getNextButton().disableProperty().unbind();
-                CMPDL.filePane.getController().setProject(project);
+                CMPDL.filePane.getController().setAddon(addon);
                 CMPDL.filePane.getController().viewLatestFiles();
                 CMPDL.mainWindow.getController().setContent(CMPDL.filePane);
                 alert.hide();
             } else {
                 alert.hide();
-                new Alert(Alert.AlertType.ERROR, "The project isn't a modpack !", ButtonType.OK).show();
+                new Alert(Alert.AlertType.ERROR, "The addon isn't a modpack !", ButtonType.OK).show();
             }
         })));
         CMPDL.EXECUTOR_SERVICE.execute(task);
